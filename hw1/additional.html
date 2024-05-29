@@ -1,0 +1,15 @@
+{{ define "body" }}
+
+   <div class="text-center">
+      <h3>Резюме:</h3>
+      <h3>Дополнительно:</h3>
+   </div>
+   <div>
+      {{ range . }}
+      <li>
+        {{ . }}
+      </li>
+      {{ end }}
+   </div>
+   <a href="/">На главную</a>
+{{ end }}

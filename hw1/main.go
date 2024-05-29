@@ -22,10 +22,8 @@ import (
 	"html/template"
 	"log"
 	"net/http"
-	"strings"
 	"sync"
 	"time"
-	"unicode"
 
 	"github.com/gorilla/mux"
 )
@@ -42,14 +40,19 @@ type Additional struct {
 	Education             string
 	AdditionalInformation string
 }
+type Work struct {
+	Job, Exp string
+}
 type Data struct {
 	sync.Mutex
 	*Essential
 	*Additional
+	*Work
 }
 
+/*
 func New() *Data {
-	d := &Data{sync.Mutex{}, &Essential{Name: "Ilya", Surname: "Druz", Patronim: "Ivanovich", Birthdate: time.Now()}, &Additional{PhoneNumber: "79852453347", Email: "ivandruz@mail.ru", Education: "MAI", AdditionalInformation: "Programmer"}}
+	d := &Data{sync.Mutex{}, &Essential{Name: "Ilya", Surname: "Druz", Patronim: "Ivanovich", Birthdate: time.Now()}, &Additional{PhoneNumber: "79852453347", Email: "ivandruz@mail.ru", Education: "MAI", AdditionalInformation: "Programmer"}, &Work{Job: "Burger king", Exp: "3"}}
 	return d
 
 }
@@ -175,20 +178,35 @@ func (d *Data) showAllInformation() {
 	fmt.Printf("Email: %s\n", d.Email)
 	fmt.Printf("Additional: %s\n", d.AdditionalInformation)
 }
-
-func CV(w http.ResponseWriter, r *http.Request) {
-	templates["CV"].Execute(w, &Data{sync.Mutex{}, &Essential{Name: "Ilya", Surname: "Druz", Patronim: "Ivanovich", Birthdate: time.Now()}, &Additional{PhoneNumber: "79852453347", Email: "ilyadruz@mail.ru", Education: "MAI", AdditionalInformation: "Programmer"}})
+*/
+// mainInfoHandler handles root URL
+func mainInfoHandler(w http.ResponseWriter, r *http.Request) {
+	templates["maininfo"].Execute(w, &Data{sync.Mutex{}, &Essential{Name: "Ilya", Surname: "Druz", Patronim: "Ivanovich", Birthdate: time.Now()}, &Additional{PhoneNumber: "79852453347", Email: "ivandruz@mail.ru", Education: "MAI", AdditionalInformation: "Programmer"}, &Work{Job: "Burger king", Exp: "3"}})
 }
 
-var templates = make(map[string]*template.Template, 1)
+func oldworkHandler(w http.ResponseWriter, r *http.Request) {
+	work := []string{}
+
+	work = append(work, "Oriflame", "McDonalds", "BurgerKing", "Roga i kopita")
+	templates["oldwork"].Execute(w, work)
+
+}
+func additionalHandler(w http.ResponseWriter, r *http.Request) {
+	Add := []string{"I have a parrot"}
+	Add = append(Add, "I have a cow")
+	Add = append(Add, "I have a flute")
+	templates["additional"].Execute(w, Add)
+}
+
+var templates = make(map[string]*template.Template, 3)
 
 func loadTemplates() {
-	templateNames := [1]string{"CV"}
+	templateNames := [3]string{"maininfo", "oldwork", "additional"}
 	for i, v := range templateNames {
 		fmt.Println(i, v)
 	}
 	for index, name := range templateNames {
-		t, err := template.ParseFiles("CV.html", name+".html")
+		t, err := template.ParseFiles("layout.html", name+".html")
 		if err == nil {
 			templates[name] = t
 			fmt.Println("Loaded template", index, name)
@@ -203,9 +221,12 @@ func main() {
 
 	fmt.Println("Starting main process")
 	r := mux.NewRouter()
+
 	//d := New()
 	//d.fillData()
 	//d.showAllInformation()
-	r.HandleFunc("/", CV)
+	r.HandleFunc("/", mainInfoHandler)
+	r.HandleFunc("/oldwork", oldworkHandler)
+	r.HandleFunc("/additional", additionalHandler)
 	log.Fatal(http.ListenAndServe("127.0.0.1:1313", r))
 }

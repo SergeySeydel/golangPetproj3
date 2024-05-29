@@ -1,2 +1,4 @@
 # Exclude .vscode directory
 .vscode/
+
+go.work

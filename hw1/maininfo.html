@@ -1,0 +1,19 @@
+{{ define "body" }}
+
+    <div class="text-center">
+        <h3>Резюме:</h3>
+    </div>
+    <div>
+       <h3> ФИО: {{ .Name }} {{ .Surname}} {{ .Patronim}} </h3>
+    </div>
+    <div>
+        <h3>EMAIL: {{ .Email }}</h3> 
+     </div>
+     <div>
+        <h3>PHONE: {{ .PhoneNumber }}</h3> 
+     </div>
+     <div>
+     <a href="/oldwork"> Опыт работы</a>
+     <a href="/additional">Дополнительная информация</a>
+
+{{ end }}
