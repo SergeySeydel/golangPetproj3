@@ -1,4 +1,7 @@
 # Exclude .vscode directory
 .vscode/
 
+
+.DS_Store
+
 go.work
