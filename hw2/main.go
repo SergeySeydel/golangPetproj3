@@ -2,100 +2,31 @@ package main
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"log"
-	"myproject/db"
+	"m/db"
 
-	_ "github.com/lib/pq"
+	"github.com/jackc/pgx/v5"
 )
 
+var queries *db.Queries
+var ctx = context.Background()
+
 func main() {
-	connStr := "user=postgres password=postgres dbname=bankstoredb sslmode=disable host=localhost port=5435"
-	dbConn, err := sql.Open("postgres", connStr)
+	fmt.Println("Starting main")
+	fmt.Println("Starting db connection...")
+	conn, err := pgx.Connect(ctx, "user=postgres password=postgres dbname=bankstoredb sslmode=disable host=localhost port=5435")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer conn.Close(ctx)
+	queries = db.New(conn)
+
+	queries.CreateCard(ctx, db.CreateCardParams{Time: "Hello", Title: "Ex", Client: "Sergey", User: ""})
+	cards, err := queries.ListCards(ctx)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	queries := db.New(dbConn)
-	ctx := context.Background()
-
-	// Create Entry
-	newEntry, err := queries.CreateEntry(ctx, "My first entry")
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println("Created Entry:", newEntry)
-
-	// Get Entry
-	entry, err := queries.GetEntry(ctx, newEntry.ID)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println("Got Entry:", entry)
-
-	// List Entries
-	entries, err := queries.ListEntries(ctx)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println("List of Entries:", entries)
-
-	// Update Entry
-	updatedEntry, err := queries.UpdateEntry(ctx, "Updated content", newEntry.ID)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println("Updated Entry:", updatedEntry)
-
-	// Delete Entry
-	err = queries.DeleteEntry(ctx, newEntry.ID)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println("Deleted Entry:", newEntry.ID)
-
-	// Create Transfer
-	newTransfer, err := queries.CreateTransfer(ctx, db.CreateTransferParams{
-		FromEntryID: newEntry.ID,
-		ToEntryID:   newEntry.ID,
-		Amount:      100.00,
-	})
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println("Created Transfer:", newTransfer)
-
-	// Get Transfer
-	transfer, err := queries.GetTransfer(ctx, newTransfer.ID)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println("Got Transfer:", transfer)
-
-	// List Transfers
-	transfers, err := queries.ListTransfers(ctx)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println("List of Transfers:", transfers)
-
-	// Update Transfer
-	updatedTransfer, err := queries.UpdateTransfer(ctx, db.UpdateTransferParams{
-		FromEntryID: newEntry.ID,
-		ToEntryID:   newEntry.ID,
-		Amount:      200.00,
-		ID:          newTransfer.ID,
-	})
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println("Updated Transfer:", updatedTransfer)
-
-	// Delete Transfer
-	err = queries.DeleteTransfer(ctx, newTransfer.ID)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println("Deleted Transfer:", newTransfer.ID)
+	fmt.Println(cards)
 }
