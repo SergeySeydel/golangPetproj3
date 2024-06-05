@@ -19,10 +19,10 @@ package main
 
 import (
 	"fmt"
-	"html/template"
 	"log"
 	"net/http"
 	"sync"
+	"text/template"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -177,8 +177,8 @@ func (d *Data) showAllInformation() {
 	fmt.Printf("Education: %s\n", d.Education)
 	fmt.Printf("Email: %s\n", d.Email)
 	fmt.Printf("Additional: %s\n", d.AdditionalInformation)
-}
-*/
+}*/
+
 // mainInfoHandler handles root URL
 func mainInfoHandler(w http.ResponseWriter, r *http.Request) {
 	templates["maininfo"].Execute(w, &Data{sync.Mutex{}, &Essential{Name: "Ilya", Surname: "Druz", Patronim: "Ivanovich", Birthdate: time.Now()}, &Additional{PhoneNumber: "79852453347", Email: "ivandruz@mail.ru", Education: "MAI", AdditionalInformation: "Programmer"}, &Work{Job: "Burger king", Exp: "3"}})
