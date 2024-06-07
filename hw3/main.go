@@ -1,32 +1,39 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"log"
+	"m/api"
+	"m/db"
+	"m/util"
+
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 func main() {
 	fmt.Println("Starting main process")
-	// config, err := util.LoadConfig(".")
-	// if err != nil {
-	// 	log.Fatal("Can not read config file", err)
-	// }
+	config, err := util.LoadConfig(".")
+	if err != nil {
+		log.Fatal("Can not read config file", err)
+	}
 
-	// pool, err := pgxpool.New(context.Background(), config.DBSource)
-	// if err != nil {
-	// 	log.Fatal("Can not connect to db", err)
-	// }
+	pool, err := pgxpool.New(context.Background(), config.DBSource)
+	if err != nil {
+		log.Fatal("Can not connect to db", err)
+	}
 
-	// defer pool.Close()
+	defer pool.Close()
 
-	// store := db.NewStore(pool)
-	// server, err := api.NewServer(config, store)
-	// if err != nil {
-	// 	log.Fatal("Can not create server", err)
-	// }
+	store := db.NewStore(pool)
+	server, err := api.NewServer(config, store)
+	if err != nil {
+		log.Fatal("Can not create server", err)
+	}
 
-	// err = server.Start(config.ServerAddress)
-	// if err != nil {
-	// 	log.Fatal("Can not start server", err)
-	// }
+	err = server.Start(config.ServerAddress)
+	if err != nil {
+		log.Fatal("Can not start server", err)
+	}
 
 }
